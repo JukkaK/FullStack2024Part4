@@ -3,14 +3,14 @@ const Blog = require('../models/blog')
 const logger = require('../utils/logger')
 
 blogRouter.get('/', async (request, response) => {
-    logger.info('hitting get all in router')
+    logger.info('hitting get all in router')    
     const blogs = await Blog.find({})
     response.json(blogs)
   })
 
-blogRouter.get('/:id', (request, response, next) => {
+blogRouter.get('/:id', async (request, response, next) => {
   logger.info('request.params.id', request.params.id)
-  Blog.findById(request.params.id)
+  await Blog.findById(request.params.id)
     .then(Blog => {
       if (Blog) {
         response.json(Blog)
@@ -21,7 +21,7 @@ blogRouter.get('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-blogRouter.post('/', (request, response, next) => {    
+blogRouter.post('/', async (request, response, next) => {    
   const body = request.body
 
   const blog = new Blog({
@@ -31,15 +31,15 @@ blogRouter.post('/', (request, response, next) => {
     likes: body.likes
   })
 
-  blog.save()
+  await blog.save()
     .then(savedBlog => {
       response.json(savedBlog)
     })
     .catch(error => next(error))
 })
 
-blogRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndDelete(request.params.id)
+blogRouter.delete('/:id', async (request, response, next) => {
+  await Blog.findByIdAndDelete(request.params.id)
     .then(() => {
       response.status(204).end()
     })
