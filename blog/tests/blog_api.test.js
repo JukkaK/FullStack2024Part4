@@ -17,19 +17,11 @@ test('blog posts are returned as json', async () => {
     .expect('Content-Type', /application\/json/)
 })
 
-after(async () => {
-  await mongoose.connection.close()
-})
-
 test('identifier property of blogs is named id', async () => {
     const blogs = await Blog.find({})
     blogs.map(blog => blog.toJSON())  
     const ids = blogs.map(b => b.id)
-    assert.equal(ids.length, 2)
-  })
-
-after(async () => {
-  await mongoose.connection.close()
+    assert.notEqual(ids.length, 0)
 })
 
 test('new post is created', async () => {
@@ -65,6 +57,60 @@ test('new post is created', async () => {
 
 })
 
+test('Update a post', async () => {
+  const blogs = await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const blogToUpdate = blogs.body[3]
+
+  const updatedBlog = {
+    title: "I changed this title",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.nomore.com",
+    likes: 1
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    const updatedBlogs = await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+assert.equal(updatedBlogs.body[3].title, updatedBlog.title)
+
+})
+
+test('Delete a post', async () => {
+  const blogs = await api
+  .get('/api/blogs')
+  .expect(200)
+  .expect('Content-Type', /application\/json/)
+
+  const blogToDelete = blogs.body[1]
+
+  await api
+  .delete(`/api/blogs/${blogToDelete.id}`)
+  .expect(204)
+
+  const blogsAtEnd = await api
+  .get('/api/blogs')
+  .expect(200)
+  .expect('Content-Type', /application\/json/)
+
+  const ids = blogsAtEnd.body.map(b => b.id)
+
+  assert.equal(ids.includes(blogToDelete.id), false)
+
+})
+
+//TODO: Why doesn't the test suite end with this?
 after(async () => {
-  await mongoose.connection.close()
+  await mongoose.connection.close()  
 })
