@@ -1,10 +1,11 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
 const logger = require('../utils/logger')
+const User = require('../models/user')
 
 blogRouter.get('/', async (request, response) => {
     logger.info('hitting get all in router')    
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs)
   })
 
@@ -23,12 +24,16 @@ blogRouter.get('/:id', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {    
   const body = request.body
+  
+  const user = await User.findOne({})
+  //const user = await User.findById(body.userId)
 
   const blog = new Blog({
     title: body.title,    
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    user: user._id 
   })
 
   await blog.save()
@@ -36,6 +41,14 @@ blogRouter.post('/', async (request, response, next) => {
       response.json(savedBlog)
     })
     .catch(error => next(error))
+
+  user.blogs = user.blogs.concat(blog._id)
+  await user.save()
+    .then(() => {
+      response.status(201).end()
+    })
+    .catch(error => next(error))
+    
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {

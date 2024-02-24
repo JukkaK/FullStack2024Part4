@@ -2,8 +2,9 @@ POST http://localhost:3003/api/blogs HTTP/1.1
 content-type: application/json
 
 {
-  "title": "My Third post",
-  "author": "Teppo Testi",
+  "title": "Tuntemattoman viides posti",
+  "author": "Make",
   "url": "http://www.example.com",
-  "likes": 0
+  "likes": 1,  
+  "userId": "65d9d8feba2cc47ab90f591a"
 }
