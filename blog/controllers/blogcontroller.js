@@ -25,11 +25,13 @@ blogRouter.get('/:id', async (request, response, next) => {
 })
 
 blogRouter.post('/', async (request, response, next) => {    
+  logger.info('entering blogRouter.post')
   const body = request.body
-  logger.info('request.token', request.token)
+  logger.info('this is request.token from request body', request.token)
   const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  logger.info('decodedToken', decodedToken)
+  logger.info('this is decoded token after jwt.verify', decodedToken)
   if (!decodedToken.id) {
+    console.log('We are in blogRouter.post and the token id is invalid. 401 status returned.')
     return response.status(401).json({ error: 'token invalid' })
   }
   const user = await User.findById(decodedToken.id)
@@ -42,12 +44,13 @@ blogRouter.post('/', async (request, response, next) => {
     user: user._id 
   })
 
+  logger.info('attempting to save this post: ', blog)
   await blog.save()
     .then(savedBlog => {
       response.json(savedBlog)
     })
     .catch(error => next(error))
-
+  logger.info('attempting to save the user reference to the blog.')
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
     .then(() => {
