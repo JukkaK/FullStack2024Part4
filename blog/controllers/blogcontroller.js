@@ -3,14 +3,15 @@ const Blog = require('../models/blog')
 const logger = require('../utils/logger')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const loginRouter = require('./login')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
+// const getTokenFrom = request => {
+//   const authorization = request.get('authorization')
+//   if (authorization && authorization.startsWith('Bearer ')) {
+//     return authorization.replace('Bearer ', '')
+//   }
+//   return null
+// }
 
 blogRouter.get('/', async (request, response) => {
     logger.info('hitting get all in router')    
@@ -33,8 +34,9 @@ blogRouter.get('/:id', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {    
   const body = request.body
-  
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  logger.info('request.token', request.token)
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  logger.info('decodedToken', decodedToken)
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }

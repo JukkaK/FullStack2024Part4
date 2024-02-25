@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/blogs HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtrdSIsImlkIjoiNjVkOWQ4ZmViYTJjYzQ3YWI5MGY1OTFhIiwiaWF0IjoxNzA4ODQ3MTQwfQ.OmocWVCzJtWbdbIe0srygo9FJo0MZ2oHkg_KRVUfYRQ
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtrdSIsImlkIjoiNjVkOWQ4ZmViYTJjYzQ3YWI5MGY1OTFhIiwiaWF0IjoxNzA4ODQ4MjQxfQ.uLA3RbUsa0MBZcVuIBRJrUuo6G7iWAWIGBOyd0TcXHM
 
 {
-  "title": "Tuntemattoman kuudes posti",
+  "title": "Tuntemattoman seiska posti",
   "author": "Make",
   "url": "http://www.example.com",
   "likes": 1,  
