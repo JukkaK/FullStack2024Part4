@@ -5,14 +5,6 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const loginRouter = require('./login')
 
-// const getTokenFrom = request => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.startsWith('Bearer ')) {
-//     return authorization.replace('Bearer ', '')
-//   }
-//   return null
-// }
-
 blogRouter.get('/', async (request, response) => {
     logger.info('hitting get all in router')    
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -66,11 +58,19 @@ blogRouter.post('/', async (request, response, next) => {
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
-  await Blog.findByIdAndDelete(request.params.id)
-    .then(() => {
+  
+  const blog = await Blog.findById(request.params.id)
+  logger.info('blog', blog)
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+  const user = await User.findById(decodedToken.id)
+  logger.info('blog.user', blog.user)
+  if (blog.user.toString() === user._id.toString()) {      
+      await Blog.findByIdAndDelete(request.params.id)
       response.status(204).end()
-    })
-    .catch(error => next(error))
+  } else {
+      response.status(401).json({ error: 'only the creator can delete a post' })
+  }
 })
 
 blogRouter.put('/:id', async (request, response, next) => {
